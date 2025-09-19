@@ -33,11 +33,26 @@ export const getUserBills = (userId: string): Bill[] => {
 // Generate bills for a specific month
 export const generateBillsForMonth = (month: string): void => {
   const users = getUsers();
-  const students = users.filter(user => user.role === 'student');
+  const students = users.filter(user => user.role === 'student' && user.selectedMessId);
   const mealRecords = getMealRecords();
   const bills = getAllBills();
   
   students.forEach(student => {
+    // Check if student's enrollment allows billing for this month
+    if (student.enrollmentDate) {
+      const enrollmentDate = new Date(student.enrollmentDate);
+      const billMonth = new Date(month + '-01');
+      
+      // Get the month after enrollment
+      const nextMonthAfterEnrollment = new Date(enrollmentDate.getFullYear(), enrollmentDate.getMonth() + 1, 1);
+      
+      // Only generate bills if the billing month is after or equal to the month following enrollment
+      if (billMonth < nextMonthAfterEnrollment) {
+        console.log(`Skipping bill generation for ${student.name} - billing starts from ${nextMonthAfterEnrollment.toISOString().slice(0, 7)}`);
+        return;
+      }
+    }
+    
     // Check if bill already exists for this student and month
     const existingBill = bills.find(bill => 
       bill.studentId === student.id && bill.month === month
@@ -47,10 +62,17 @@ export const generateBillsForMonth = (month: string): void => {
       // Get meal records for this student in the specified month
       const studentMeals = mealRecords.filter(meal => 
         meal.userId === student.id && 
-        meal.date.startsWith(month)
+        meal.date.startsWith(month) &&
+        meal.messId === student.selectedMessId // Ensure meals are from the correct mess
       );
       
       if (studentMeals.length > 0) {
+        // Get mess name for the bill
+        const { getMesses } = require('./messService');
+        const messes = getMesses();
+        const mess = messes.find(m => m.id === student.selectedMessId);
+        const messName = mess ? mess.name : "Unknown Mess";
+        
         const billItems: BillItem[] = studentMeals.map(meal => ({
           date: meal.date,
           mealName: meal.menuItemName,
@@ -64,8 +86,8 @@ export const generateBillsForMonth = (month: string): void => {
           id: Date.now().toString() + student.id,
           studentId: student.id,
           studentName: student.name,
-          messId: student.selectedMessId || "default",
-          messName: "Default Mess",
+          messId: student.selectedMessId,
+          messName,
           month,
           totalAmount,
           status: 'pending',

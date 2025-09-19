@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Send, CreditCard } from "lucide-react";
+import { Building2, Send, CreditCard, Lock } from "lucide-react";
 import { createAdminRequest } from "@/services/messagingService";
 
 const AdminRequest = () => {
   const [messName, setMessName] = useState("");
   const [adminName, setAdminName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
   const [businessDetails, setBusinessDetails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -22,7 +23,7 @@ const AdminRequest = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!messName.trim() || !adminName.trim() || !adminEmail.trim() || !businessDetails.trim()) {
+    if (!messName.trim() || !adminName.trim() || !adminEmail.trim() || !adminPassword.trim() || !businessDetails.trim()) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -31,11 +32,20 @@ const AdminRequest = () => {
       return;
     }
 
+    if (adminPassword.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       // Create the admin request
-      createAdminRequest(messName, adminName, adminEmail, businessDetails);
+      createAdminRequest(messName, adminName, adminEmail, businessDetails, adminPassword);
       
       toast({
         title: "Request Submitted",
@@ -46,6 +56,7 @@ const AdminRequest = () => {
       setMessName("");
       setAdminName("");
       setAdminEmail("");
+      setAdminPassword("");
       setBusinessDetails("");
 
       // Redirect to payment page (placeholder for now)
@@ -117,6 +128,22 @@ const AdminRequest = () => {
                   onChange={(e) => setAdminEmail(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adminPassword">Password *</Label>
+                <Input
+                  id="adminPassword"
+                  type="password"
+                  placeholder="Create a password (min. 6 characters)"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  <Lock className="inline h-3 w-3 mr-1" />
+                  This password will be used for admin login along with your admin key
+                </p>
               </div>
 
               <div className="space-y-2">

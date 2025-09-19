@@ -193,22 +193,37 @@ const Dashboard = () => {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center text-lg">
               <UserMinus className="mr-2 h-5 w-5 text-orange-500" />
-              Student Management - {user.messName}
+              Student Enrollment Management - {user.messName}
             </CardTitle>
             <CardDescription className="text-sm">
-              Manage students in your mess ({messStudents.length} students)
+              Manage students in your mess ({messStudents.length} students) - Billing starts from next month after enrollment
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4">
             {messStudents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {messStudents.map((student) => (
+                {messStudents.map((student) => {
+                  const enrollmentDate = student.enrollmentDate ? new Date(student.enrollmentDate) : null;
+                  const nextBillingMonth = enrollmentDate ? new Date(enrollmentDate.getFullYear(), enrollmentDate.getMonth() + 1, 1) : null;
+                  const billingStatus = nextBillingMonth ? (new Date() >= nextBillingMonth ? 'Active' : `Starts ${nextBillingMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`) : 'Unknown';
+                  
+                  return (
                   <div key={student.id} className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
                         <h4 className="font-semibold text-sm">{student.name}</h4>
                         <p className="text-xs text-muted-foreground">{student.studentId}</p>
                         <p className="text-xs text-blue-600 dark:text-blue-400">{student.email}</p>
+                        {enrollmentDate && (
+                          <div className="mt-1">
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              Enrolled: {enrollmentDate.toLocaleDateString()}
+                            </p>
+                            <p className="text-xs font-medium text-green-600 dark:text-green-400">
+                              Billing: {billingStatus}
+                            </p>
+                          </div>
+                        )}
                       </div>
                       <Button
                         size="sm"
@@ -221,7 +236,8 @@ const Dashboard = () => {
                       </Button>
                     </div>
                   </div>
-                ))}
+                  )
+                })})
               </div>
             ) : (
               <div className="text-center py-6">

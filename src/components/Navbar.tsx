@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Utensils, LogOut, User, Home, MessageCircle, Receipt, Bell, MenuIcon, BarChart3, ShoppingCart, Building2 } from "lucide-react";
+import { Utensils, LogOut, User, Home, MessageCircle, Receipt, Bell, MenuIcon, BarChart3, ShoppingCart, Building2, Users } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import MobileMenubar from "./MobileMenubar";
 
@@ -59,6 +59,12 @@ const Navbar = () => {
       label: "Bill Management", 
       path: "/bill-management", 
       icon: Receipt, 
+      show: isAdmin 
+    },
+    { 
+      label: "Student Enrollment", 
+      path: "/student-enrollment", 
+      icon: Users, 
       show: isAdmin 
     },
     { 

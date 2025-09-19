@@ -1,15 +1,22 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Check, Building2, ArrowLeft } from "lucide-react";
+import { CreditCard, Check, Building2, ArrowLeft, Lock } from "lucide-react";
 
 const AdminPayment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setPasswordConfirm] = useState("");
+  const [isPasswordSet, setIsPasswordSet] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handlePayment = async () => {
     setIsProcessing(true);
@@ -25,7 +32,36 @@ const AdminPayment = () => {
     }, 3000);
   };
 
-  if (paymentComplete) {
+  const handleCreatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+      });
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Password Mismatch",
+        description: "Passwords do not match.",
+      });
+      return;
+    }
+    
+    // In a real application, you would send this to your backend
+    // For now, we'll just simulate storing it
+    setIsPasswordSet(true);
+    toast({
+      title: "Password Created",
+      description: "Your password has been successfully created. You'll use it when logging in as admin.",
+    });
+  };
+  if (paymentComplete && !showPasswordForm) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-mess-light to-background p-4">
         <div className="max-w-md w-full">
@@ -45,9 +81,103 @@ const AdminPayment = () => {
                 <p className="text-sm text-muted-foreground">
                   You will receive an email with your admin key once approved.
                 </p>
+                <Button onClick={() => setShowPasswordForm(true)} className="w-full mb-3">
+                  <Lock className="mr-2 h-4 w-4" />
+                  Create Admin Password
+                </Button>
+                <Link to="/login">
+                  <Button variant="outline" className="w-full">
+                    Skip for Now
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (showPasswordForm && !isPasswordSet) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-mess-light to-background p-4">
+        <div className="max-w-md w-full">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Lock className="mr-2 h-5 w-5 text-mess-primary" />
+                Create Admin Password
+              </CardTitle>
+              <CardDescription>
+                Set a secure password for your admin account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreatePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password (min. 6 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Create Password
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full mt-2"
+                  onClick={() => setShowPasswordForm(false)}
+                >
+                  Back
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPasswordSet) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-mess-light to-background p-4">
+        <div className="max-w-md w-full">
+          <Card className="text-center">
+            <CardContent className="pt-6">
+              <div className="flex justify-center mb-4">
+                <div className="bg-green-100 rounded-full p-3">
+                  <Check className="h-8 w-8 text-green-600" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Password Created!</h2>
+              <p className="text-muted-foreground mb-6">
+                Your admin password has been successfully created.
+                You'll use this along with your admin key to log in.
+              </p>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  You will receive an email with your admin key once approved.
+                </p>
                 <Link to="/login">
                   <Button className="w-full">
-                    Back to Login
+                    Continue to Login
                   </Button>
                 </Link>
               </div>

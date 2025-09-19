@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Receipt, Send, Download, Users, Calendar, Filter } from "lucide-react";
-import { getAllBills, generateBillsForMonth, sendBillNotifications } from "@/services";
+import { getAllBills, generateBillsForMonth, sendBillNotifications, getMessBills } from "@/services";
 
 const BillManagement = () => {
   const { user, isAdmin } = useAuth();
@@ -24,11 +24,12 @@ const BillManagement = () => {
     );
   }
 
-  const allBills = getAllBills();
+  const allBills = user.selectedMessId ? getMessBills(user.selectedMessId) : getAllBills();
   const filteredBills = allBills.filter(bill => {
     const monthMatch = bill.month === selectedMonth;
     const statusMatch = filterStatus === 'all' || bill.status === filterStatus;
-    return monthMatch && statusMatch;
+    const messMatch = user.selectedMessId ? bill.messId === user.selectedMessId : true;
+    return monthMatch && statusMatch && messMatch;
   });
 
   const handleGenerateBills = () => {
@@ -54,10 +55,15 @@ const BillManagement = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold flex items-center">
-        <Receipt className="mr-2 h-6 w-6 text-mess-primary" />
-        Bill Management
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold flex items-center">
+          <Receipt className="mr-2 h-6 w-6 text-mess-primary" />
+          Bill Management - {user.messName || 'Your Mess'}
+        </h1>
+        <Badge variant="outline" className="text-sm">
+          {user.messName || 'All Messes'}
+        </Badge>
+      </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -114,7 +120,9 @@ const BillManagement = () => {
       <Card>
         <CardHeader>
           <CardTitle>Bill Generation & Management</CardTitle>
-          <CardDescription>Generate and manage student bills</CardDescription>
+          <CardDescription>
+            Generate and manage student bills for {user.messName || 'your mess'} only
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -166,9 +174,9 @@ const BillManagement = () => {
       {/* Bills List */}
       <Card>
         <CardHeader>
-          <CardTitle>Bills for {selectedMonth}</CardTitle>
+          <CardTitle>Bills for {selectedMonth} - {user.messName || 'Your Mess'}</CardTitle>
           <CardDescription>
-            Showing {filteredBills.length} bills
+            Showing {filteredBills.length} bills from your mess
             {filterStatus !== 'all' && ` (${filterStatus})`}
           </CardDescription>
         </CardHeader>

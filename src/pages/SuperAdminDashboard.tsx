@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Building2, Plus, Key, Trash2, Settings, Users, TrendingUp, CheckCircle, XCircle, Clock } from "lucide-react";
 import { getMesses, createMess, deleteMess, updateMess, getAdminKeys } from "@/services";
 import { getAdminRequests, updateAdminRequest, type AdminRequest } from "@/services/messagingService";
+import { setAdminPassword } from "@/services/userService";
 
 const SuperAdminDashboard = () => {
   const { user } = useAuth();
@@ -42,11 +43,11 @@ const SuperAdminDashboard = () => {
     }
 
     const facilitiesList = facilities.split(",").map(f => f.trim()).filter(f => f);
-    createMess(messName, facilitiesList, description);
+    const newMess = createMess(messName, facilitiesList, description);
     
     toast({
       title: "Mess Created",
-      description: `${messName} has been created successfully with admin key`,
+      description: `${messName} has been created successfully with admin key: ${newMess.adminKey}`,
     });
 
     // Reset form
@@ -81,7 +82,12 @@ const SuperAdminDashboard = () => {
   const handleApproveRequest = (request: AdminRequest) => {
     // Create the mess first
     const facilitiesList = ["Breakfast", "Lunch", "Dinner"];
-    createMess(request.messName, facilitiesList, `Managed by ${request.adminName}`);
+    const newMess = createMess(request.messName, facilitiesList, `Managed by ${request.adminName}`);
+    
+    // Set the admin password
+    if (request.adminPassword) {
+      setAdminPassword(request.adminEmail, request.adminPassword);
+    }
     
     // Update the request status
     updateAdminRequest(request.id, {

@@ -14,6 +14,9 @@ This is a React-based web application for managing mess operations, including me
 - Feedback and analytics system
 - Multi-mess support
 - Role-based access control (Students, Mess Admins, Super Admins)
+- Student enrollment tracking with automatic billing delays
+- Admin-specific student management with enrollment dates
+- Isolated billing data per mess
 
 ## Development Setup
 
@@ -77,6 +80,34 @@ src/
 ├── services/       # API and data services
 └── types/          # TypeScript type definitions
 ```
+
+## New Features Documentation
+
+### Student Enrollment Tracking
+
+The system now includes enhanced student enrollment tracking with the following features:
+
+1. **Automatic Enrollment Date Setting**: When a student registers, the system automatically sets their enrollment date to the current date.
+
+2. **Delayed Billing**: Student billing starts automatically from the next month after enrollment, not immediately upon registration.
+
+3. **Admin-Specific Views**: Each admin can only see students and billing information for their own mess, ensuring data isolation.
+
+4. **Enhanced Student Management**: Admins can view detailed enrollment information including:
+   - Enrollment date
+   - Billing start date
+   - Current billing status (Active/Waiting)
+   - Bill history and statistics
+
+5. **Search and Filter**: Admins can search and filter students by name, email, student ID, or billing status.
+
+### Implementation Details
+
+- Added `enrollmentDate` field to the User interface
+- Modified bill generation service to respect enrollment dates
+- Created new Student Enrollment Tracking page for admins
+- Enhanced existing Dashboard with enrollment information
+- Added navigation menu item for the new feature
 
 ## Deployment
 

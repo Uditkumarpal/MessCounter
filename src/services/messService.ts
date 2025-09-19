@@ -34,7 +34,7 @@ export const createMess = (
   name: string,
   facilities: string[], 
   description?: string
-): void => {
+): Mess => {
   const messes = getMesses();
   const adminKeys = getAdminKeys();
   
@@ -65,6 +65,8 @@ export const createMess = (
   
   localStorage.setItem(MESSES_KEY, JSON.stringify(messes));
   localStorage.setItem(ADMIN_KEYS_KEY, JSON.stringify(adminKeys));
+  
+  return newMess;
 };
 
 export const updateMess = (messId: string, updates: Partial<Mess>): void => {

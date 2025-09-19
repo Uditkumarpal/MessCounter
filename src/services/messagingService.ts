@@ -117,6 +117,7 @@ export interface AdminRequest {
   messName: string;
   adminName: string;
   adminEmail: string;
+  adminPassword?: string; // Store hashed password
   businessDetails: string;
   paymentStatus: 'pending' | 'paid' | 'rejected';
   requestStatus: 'pending' | 'approved' | 'rejected';
@@ -129,13 +130,14 @@ export const getAdminRequests = (): AdminRequest[] => {
   return JSON.parse(localStorage.getItem(ADMIN_REQUESTS_KEY) || "[]");
 };
 
-export const createAdminRequest = (messName: string, adminName: string, adminEmail: string, businessDetails: string): AdminRequest => {
+export const createAdminRequest = (messName: string, adminName: string, adminEmail: string, businessDetails: string, adminPassword?: string): AdminRequest => {
   const requests = getAdminRequests();
   const newRequest: AdminRequest = {
     id: Date.now().toString(),
     messName,
     adminName,
     adminEmail,
+    adminPassword, // Store the password (in a real app, this should be hashed)
     businessDetails,
     paymentStatus: 'pending',
     requestStatus: 'pending',

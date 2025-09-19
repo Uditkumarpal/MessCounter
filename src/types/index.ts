@@ -8,6 +8,7 @@ export interface User {
   selectedMessId?: string;
   adminKey?: string; // Key provided by super admin for admin login
   messName?: string; // Name of the mess (populated for admins)
+  enrollmentDate?: string; // Date when student enrolled (ISO string)
 }
 
 export interface Mess {

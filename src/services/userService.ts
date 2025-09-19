@@ -104,7 +104,8 @@ export const registerStudent = (name: string, email: string, studentId: string, 
     password,
     role: 'student',
     studentId,
-    selectedMessId
+    selectedMessId,
+    enrollmentDate: new Date().toISOString() // Set enrollment date to current date
   };
   
   console.log('Registering new user:', newUser);
@@ -150,4 +151,29 @@ export const resetUserData = (): void => {
   localStorage.removeItem("currentUser");
   currentUser = null;
   initializeData();
+};
+
+// Function to set or update admin password
+export const setAdminPassword = (adminEmail: string, password: string): boolean => {
+  const users = getUsers();
+  const adminIndex = users.findIndex(user => user.email === adminEmail && user.role === 'admin');
+  
+  if (adminIndex !== -1) {
+    users[adminIndex].password = password;
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    return true;
+  }
+  
+  // If admin doesn't exist yet, create a placeholder admin user
+  const newAdmin: User = {
+    id: `admin_${Date.now()}`,
+    name: "Admin User",
+    email: adminEmail,
+    password: password,
+    role: 'admin'
+  };
+  
+  users.push(newAdmin);
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  return true;
 };

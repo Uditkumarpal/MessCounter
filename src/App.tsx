@@ -22,6 +22,7 @@ import BillManagement from "@/pages/BillManagement";
 import StudentOrdering from "@/pages/StudentOrdering";
 import AdminRequest from "@/pages/AdminRequest";
 import AdminPayment from "@/pages/AdminPayment";
+import StudentEnrollmentTracking from "@/pages/StudentEnrollmentTracking";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
                 <Route path="/feedback" element={<FeedbackAnalytics />} />
                 <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
                 <Route path="/bill-management" element={<BillManagement />} />
+                <Route path="/student-enrollment" element={<StudentEnrollmentTracking />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
